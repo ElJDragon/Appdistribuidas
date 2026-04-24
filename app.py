@@ -102,7 +102,7 @@ def listar_productos():
                 "id": row[0],
                 "nombre": row[1],
                 "precio": float(row[2]) if row[2] is not None else None,
-                "image_url": row[3],
+                "imageurl": row[3],
             })
 
         return jsonify({
