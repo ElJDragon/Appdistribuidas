@@ -2,7 +2,7 @@ import os
 from flask import Flask, jsonify
 from mssql_python import connect
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/Imagenes', static_folder='Imagenes')
 
 
 def get_connection():
