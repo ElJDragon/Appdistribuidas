@@ -179,7 +179,7 @@ def enviar_correo_alerta(asunto, mensaje, destino):
     servidor.login(email_user, email_password)
     servidor.sendmail(email_user, [destino], msg.as_string())
     servidor.quit()
-============== RESEND
+    
 # Configurar API Key
 resend.api_key = os.environ["RESEND_API_KEY"]
 FROM_EMAIL = os.environ.get("MAIL_RESEND", "onboarding@resend.dev")
@@ -219,6 +219,7 @@ def enviar_alerta_resend():
             "status": "error",
             "msg": str(e)
         }), 500
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
