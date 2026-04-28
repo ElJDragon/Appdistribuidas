@@ -161,12 +161,19 @@ def enviar_alerta():
         enviar_correo_alerta(asunto, mensaje, destino)
         return jsonify({
             "success": True,
-            "message": "Correo enviado"
+            "message": "Correo enviado correctamente"
         })
-    except Exception as e:
+    except ValueError as ve:
         return jsonify({
             "success": False,
-            "error": str(e)
+            "error": str(ve)
+        }), 400
+    except Exception as e:
+        import traceback
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "details": traceback.format_exc()
         }), 500
 
 
