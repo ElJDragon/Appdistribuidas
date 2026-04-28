@@ -1,8 +1,12 @@
 import os
 import smtplib
+import resend
+import threading
+
 from flask import Flask, jsonify, request
 from mssql_python import connect
 from email.mime.text import MIMEText
+
 
 app = Flask(__name__, static_url_path='/Imagenes', static_folder='Imagenes')
 
@@ -175,7 +179,46 @@ def enviar_correo_alerta(asunto, mensaje, destino):
     servidor.login(email_user, email_password)
     servidor.sendmail(email_user, [destino], msg.as_string())
     servidor.quit()
+============== RESEND
+# Configurar API Key
+resend.api_key = os.environ["RESEND_API_KEY"]
+FROM_EMAIL = os.environ.get("MAIL_RESEND", "onboarding@resend.dev")
 
+# Función de envío
+def enviar_correo_resend(destino, asunto, mensaje):
+    resend.Emails.send({
+        "from": FROM_EMAIL,
+        "to": [destino],
+        "subject": asunto,
+        "html": f"<p>{mensaje}</p>"
+    })
+
+# Endpoint
+@app.route("/enviar-alerta-resend", methods=["POST"])
+def enviar_alerta_resend():
+    data = request.json
+
+    correo = data.get("email")
+    asunto = data.get("subject", "Notificación")
+    mensaje = data.get("message", "Mensaje desde Render")
+
+    if not correo:
+        return jsonify({"error": "Falta el email"}), 400
+
+    try:
+        # Evita WORKER TIMEOUT
+        threading.Thread(target=enviar_correo_resend, args=(correo, asunto, mensaje)).start()
+
+        return jsonify({
+            "status": "ok",
+            "msg": "Correo enviado (async)"
+        })
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "msg": str(e)
+        }), 500
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
