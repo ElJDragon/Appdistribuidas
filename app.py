@@ -36,26 +36,6 @@ def get_connection():
     return connect(connection_string)
 
 
-def enviar_correo_alerta(asunto, mensaje, destino):
-    email_user = os.getenv("EMAIL_USER")
-    email_password = os.getenv("EMAIL_PASSWORD")
-
-    if not email_user:
-        raise ValueError("Falta EMAIL_USER")
-    if not email_password:
-        raise ValueError("Falta EMAIL_PASSWORD")
-
-    msg = MIMEText(mensaje, "plain", "utf-8")
-    msg["Subject"] = asunto
-    msg["From"] = email_user
-    msg["To"] = destino
-
-    servidor = smtplib.SMTP("smtp.gmail.com", 587)
-    servidor.starttls()
-    servidor.login(email_user, email_password)
-    servidor.sendmail(email_user, [destino], msg.as_string())
-    servidor.quit()
-
 @app.route("/")
 def home():
     return jsonify({
@@ -176,6 +156,25 @@ def enviar_alerta():
             "details": traceback.format_exc()
         }), 500
 
+def enviar_correo_alerta(asunto, mensaje, destino):
+    email_user = os.getenv("EMAIL_USER")
+    email_password = os.getenv("EMAIL_PASSWORD")
+
+    if not email_user:
+        raise ValueError("Falta EMAIL_USER")
+    if not email_password:
+        raise ValueError("Falta EMAIL_PASSWORD")
+
+    msg = MIMEText(mensaje, "plain", "utf-8")
+    msg["Subject"] = asunto
+    msg["From"] = email_user
+    msg["To"] = destino
+
+    servidor = smtplib.SMTP("smtp.gmail.com", 587)
+    servidor.starttls()
+    servidor.login(email_user, email_password)
+    servidor.sendmail(email_user, [destino], msg.as_string())
+    servidor.quit()
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
