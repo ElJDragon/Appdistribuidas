@@ -4,11 +4,13 @@ import resend
 import threading
 
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from mssql_python import connect
 from email.mime.text import MIMEText
 
 
 app = Flask(__name__, static_url_path='/Imagenes', static_folder='Imagenes')
+CORS(app)  # Habilitar CORS para todas las rutas
 
 
 def get_connection():
